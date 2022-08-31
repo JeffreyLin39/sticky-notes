@@ -1,8 +1,10 @@
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import { Account } from "../models/account";
 import bcrypt from "bcrypt";
 
-express.Router().post("/register", async (req: Request, res: Response) => {
+const router = require("express").Router();
+
+router.post("/register", async (req: Request, res: Response) => {
 	try {
 		const { email, password } = req.body;
 		if (!email || !password) {
@@ -11,7 +13,7 @@ express.Router().post("/register", async (req: Request, res: Response) => {
 		const salt = await bcrypt.genSalt(10);
 		const encryptedPassword = await bcrypt.hash(password, salt);
 
-		const user = new Account({ email, encryptedPassword, notes: [] });
+		const user = new Account({ email, password: encryptedPassword, notes: [] });
 		user
 			.save()
 			.then((response) => {
@@ -31,34 +33,26 @@ express.Router().post("/register", async (req: Request, res: Response) => {
 	}
 });
 
-express.Router().put("/login", async (req: Request, res: Response) => {
+router.post("/login", async (req: Request, res: Response) => {
 	try {
 		const { email, password } = req.body;
 		if (!email || !password) {
 			throw Error("Invalid or missing parameters...");
 		}
 
-		let accountUser: any;
+		const user = await Account.findOne({ email });
 
-		Account.findOne({ email })
-			.then((user) => {
-				if (user) {
-					accountUser = user;
-					return bcrypt.compare(user.password, password);
-				} else {
-					throw Error("Email or password incorrect...");
-				}
-			})
-			.catch((error: any | unknown) => {
-				console.error(error);
-				res.status(400).json({ status: 400, message: error.toString() });
-			})
+		if (!user) {
+			throw Error("Email or password incorrect...");
+		}
+		bcrypt
+			.compare(password, user.password)
 			.then((response) => {
-				if (response && accountUser) {
+				if (response) {
 					res.status(200).json({
 						status: 200,
 						message: "Action accepted",
-						data: { user: accountUser },
+						data: { user },
 					});
 				} else {
 					throw Error("Email or password incorrect...");
@@ -74,4 +68,4 @@ express.Router().put("/login", async (req: Request, res: Response) => {
 	}
 });
 
-module.exports = express.Router();
+module.exports = router;

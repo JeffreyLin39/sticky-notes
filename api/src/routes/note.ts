@@ -95,14 +95,17 @@ router.get("/getNote/:id", (req: Request, res: Response) => {
 	}
 });
 
-router.delete("/deleteNote/:id", (req: Request, res: Response) => {
+router.delete("/deleteNote/:uid/:id", (req: Request, res: Response) => {
 	try {
-		const { id } = req.params;
-		if (!id) {
+		const { uid, id } = req.params;
+		if (!uid || !id) {
 			throw Error("Invalid or missing parameters...");
 		}
 
-		Note.findByIdAndDelete({ _id: id })
+		Note.deleteOne({ _id: id })
+			.then(() => {
+				return Account.updateOne({ _id: uid }, { $pull: { notes: { id } } });
+			})
 			.then(() => {
 				res.status(200).json({
 					status: 200,

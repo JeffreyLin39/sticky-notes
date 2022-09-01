@@ -20,7 +20,7 @@ router.post("/register", async (req: Request, res: Response) => {
 				res.status(200).json({
 					status: 200,
 					message: "Action accepted",
-					data: { id: response._id.toString() },
+					data: { user: response },
 				});
 			})
 			.catch((error: any | unknown) => {

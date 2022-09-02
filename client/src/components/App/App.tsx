@@ -17,7 +17,7 @@ const App: React.FunctionComponent = () => {
 				<Route path="/" element={<Dashboard />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/register" element={<Register />} />
-				<Route path="/note/:id" element={<Note />} />
+				<Route path="/note/:uid/:id" element={<Note />} />
 			</Routes>
 		</AppProvider>
 	);

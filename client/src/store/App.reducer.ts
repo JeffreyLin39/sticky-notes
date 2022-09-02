@@ -5,6 +5,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 export interface INote {
 	id: string;
 	title: string;
+	value: string;
 }
 
 export interface IAccount {
@@ -44,9 +45,21 @@ export const appSlice = createSlice({
 				);
 			}
 		},
+		updateNote: (state, action: PayloadAction<INote>) => {
+			if (state.user) {
+				state.user.notes = state.user.notes.map((note) => {
+					if (note.id === action.payload.id) {
+						return action.payload;
+					} else {
+						return note;
+					}
+				});
+			}
+		},
 	},
 });
 
-export const { loadLogin, loadUser, loadNote, removeNote } = appSlice.actions;
+export const { loadLogin, loadUser, loadNote, removeNote, updateNote } =
+	appSlice.actions;
 
 export default appSlice.reducer;

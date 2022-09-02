@@ -77,7 +77,7 @@ router.get("/getNote/:id", (req: Request, res: Response) => {
 			throw Error("Invalid or missing parameters...");
 		}
 
-		Note.find({ _id: id })
+		Note.findOne({ _id: id })
 			.then((response) => {
 				res.status(200).json({
 					status: 200,

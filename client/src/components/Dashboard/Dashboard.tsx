@@ -5,7 +5,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store/App.store";
 import { useDispatch } from "react-redux";
 import { loadNote, removeNote } from "../../store/App.reducer";
-
+// React Router
+import { useNavigate } from "react-router-dom";
 // Material UI
 import {
 	Box,
@@ -33,6 +34,7 @@ import {
 const Dashboard: React.FunctionComponent = () => {
 	const user = useSelector((state: RootState) => state.AppReducer.user);
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const [newNote, setNewNote] = React.useState<boolean>(false);
 	const [title, setTitle] = React.useState<string>("");
 
@@ -48,7 +50,7 @@ const Dashboard: React.FunctionComponent = () => {
 			.then((response) => response.json())
 			.then((response) => {
 				if (response.status === 200) {
-					dispatch(loadNote({ id: response.data.id, title }));
+					dispatch(loadNote({ id: response.data.id, title, value: "" }));
 				}
 			});
 	};
@@ -85,10 +87,19 @@ const Dashboard: React.FunctionComponent = () => {
 			/>
 			<Grid container spacing={2} sx={gridStyles}>
 				{user.notes.map((note) => (
-					<Grid item sx={gridItemStyles} xs={2} key={note.id}>
+					<Grid
+						item
+						sx={gridItemStyles}
+						xs={2}
+						key={note.id}
+						onClick={() => {
+							navigate(`/note/${user._id}/${note.id}`);
+						}}
+					>
 						<DeleteIcon
 							sx={deleteIconStyles}
-							onClick={() => {
+							onClick={(event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+								event.stopPropagation();
 								deleteNote(note.id);
 							}}
 						/>
